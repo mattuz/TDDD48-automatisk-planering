@@ -44,8 +44,11 @@ content_types = ["food", "medicine"]
 # Random seed
 ########################################################################################
 
-# TODO: Set seed to 0 if you want more predictability...
-# random.seed(0);
+
+# Set seed to a constant for more predictability...
+# (Should be random, but should still generate the same output
+#  if executed again with the same parameters)
+random.seed(42);
 
 ########################################################################################
 # Helper functions

@@ -1,4 +1,4 @@
-# Files created by planners
+# Generally irrelevant files created by planners
 
 *.tmp.*
 tmpoutput.*
@@ -8,10 +8,12 @@ elapsed.time
 output
 output.sas
 plan_numbers_and_cost
+downward.tmp*
+*.rlx
 
 
-# Created by https://www.toptal.com/developers/gitignore/api/java,python,intellij,emacs,vim,visualstudiocode,libreoffice,linux,macos,windows,eclipse
-# Edit at https://www.toptal.com/developers/gitignore?templates=java,python,intellij,emacs,vim,visualstudiocode,libreoffice,linux,macos,windows,eclipse
+# Created by https://www.toptal.com/developers/gitignore/api/vim,java,emacs,linux,macos,python,eclipse,windows,intellij,libreoffice,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=vim,java,emacs,linux,macos,python,eclipse,windows,intellij,libreoffice,visualstudiocode
 
 ### Eclipse ###
 .metadata
@@ -239,6 +241,10 @@ fabric.properties
 # https://plugins.jetbrains.com/plugin/12206-codestream
 .idea/codestream.xml
 
+# Azure Toolkit for IntelliJ plugin
+# https://plugins.jetbrains.com/plugin/8053-azure-toolkit-for-intellij
+.idea/**/azureSettings.xml
+
 ### Java ###
 # Compiled class file
 *.class
@@ -311,6 +317,10 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+### macOS Patch ###
+# iCloud generated files
+*.icloud
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
@@ -414,7 +424,15 @@ ipython_config.py
 #   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 #poetry.lock
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+# pdm
+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#pdm.lock
+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
+#   in version control.
+#   https://pdm.fming.dev/#use-with-ide
+.pdm.toml
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
 
 # Celery stuff
@@ -464,6 +482,16 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+### Python Patch ###
+# Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
+poetry.toml
+
+# ruff
+.ruff_cache/
+
+# LSP config files
+pyrightconfig.json
+
 ### Vim ###
 # Swap
 [._]*.s[a-v][a-z]
@@ -503,8 +531,6 @@ tags
 .history
 .ionide
 
-# Support for Project snippet scope
-
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -531,4 +557,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/java,python,intellij,emacs,vim,visualstudiocode,libreoffice,linux,macos,windows,eclipse
+# End of https://www.toptal.com/developers/gitignore/api/vim,java,emacs,linux,macos,python,eclipse,windows,intellij,libreoffice,visualstudiocode
