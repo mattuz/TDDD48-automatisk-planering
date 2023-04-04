@@ -1,20 +1,25 @@
 (define (domain emergency-services)
     (:requirements :strips :typing)
     (:types
-        person uav crate contents location - obj
+        person uav crate contents location - object
     )
     (:predicates
-        (at ?x - obj ?l - location)
+        (at ?x - object ?l - location)
         (contains ?c - crate ?cont - contents)
         (carry ?uav - uav ?c - crate)
         (has ?p - person ?cont - contents)
         (wants ?p - person ?cont - contents)
+        (free ?uav - uav)
     )
 
     (:action LOAD-UAV
         :parameters (?c - crate ?uav - uav ?l - location)
-        :precondition (and (at ?c ?l) (at ?uav ?l))
-        :effect (and (carry ?uav ?c) (not(at ?c ?l)))
+        :precondition (and (at ?c ?l) (at ?uav ?l)
+        (free ?uav)
+        )
+        :effect (and (carry ?uav ?c) (not(at ?c ?l))
+        (not(free ?uav))
+        )
     )
 
     (:action UNLOAD-UAV-TO-PERSON
@@ -23,9 +28,11 @@
             ?p - person ?cont - contents
         )
         :precondition (and (at ?uav ?l) (carry ?uav ?c)
-        (contains ?c ?cont) (wants ?p ?cont))
+        (contains ?c ?cont) (wants ?p ?cont) (at ?p ?l)
+        )
         :effect (and (at ?c ?l) (not(carry ?uav ?c))
         (not (wants ?p ?cont)) (has ?p ?cont)
+        (at ?uav ?l) (free ?uav)
         )
     )
 
