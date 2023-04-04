@@ -10,6 +10,7 @@
 (:init
     (at c1 depot) (at c2 depot) (at c3 depot)
     (at mark l1) (at ellie l2) (at uav1 start)
+    (free uav1)
     (contains c1 medicine) (contains c2 food) (contains c3 water)
     (wants mark food) (wants ellie medicine)
 )

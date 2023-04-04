@@ -10,7 +10,7 @@
 
 (:init
     (wants p1 food) (at c depot) (at uav1 start)
-    (at p1 l1) (contains c food)
+    (at p1 l1) (contains c food) (free uav1)
 )
 
 (:goal (and
