@@ -8,7 +8,7 @@
         (contains ?c - crate ?cont - contents)
         (carry ?uav - uav ?c - crate)
         (has ?p - person ?cont - contents)
-
+        (wants ?p - person ?cont - contents)
     )
 
     (:action LOAD-UAV
@@ -17,10 +17,16 @@
         :effect (and (carry ?uav ?c) (not(at ?c ?l)))
     )
 
-    (:action UNLOAD-UAV
-        :parameters (?uav - uav ?c - crate ?l - location)
-        :precondition (and (at ?uav ?l) (carry ?uav ?c))
-        :effect (and (at ?c ?l) (not(carry ?uav ?c)))
+    (:action UNLOAD-UAV-TO-PERSON
+        :parameters (
+            ?uav - uav ?c - crate ?l - location
+            ?p - person ?cont - contents
+        )
+        :precondition (and (at ?uav ?l) (carry ?uav ?c)
+        (contains ?c ?cont) (wants ?p ?cont))
+        :effect (and (at ?c ?l) (not(carry ?uav ?c))
+        (not (wants ?p ?cont)) (has ?p ?cont)
+        )
     )
 
     (:action FLY-UAV
@@ -30,5 +36,6 @@
     )
     
 
+    
     
 )
