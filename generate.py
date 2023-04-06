@@ -294,7 +294,7 @@ def main():
         for objname in crate:
             f.write("\t" + objname + " - crate\n")
 
-        for objname in contents:
+        for objname in content_types:
             f.write("\t" + objname + " - contents\n")
 
         for objname in person:
@@ -311,8 +311,29 @@ def main():
         f.write("(:init\n")
 
         # TODO: Initialize all facts here!
-        for c in crate: 
-            f.write("\t" + "(at " + c + "depot)")
+
+        for types in range(len(content_types)):
+            for c in crates_with_contents[types]:
+                f.write("\t" + "(at " + c + " " + "depot)\n")
+                f.write("\t" + "(contains " + c + " " + 
+                        content_types[types] + ")\n")
+
+        
+        #not sure if we want the UAV to start in depot..
+        for u in uav:
+            f.write("\t" + "(at " + u + " depot)\n")
+            f.write("\t" + "(free " + u + ")\n")
+
+        #Assign people to random locations (not depot)
+        for p in person:
+            l = random.choice(location[1:])
+            f.write("\t" + "(at " + p + " " + l + ")\n")
+        
+        for p in range(len(person)):
+            for c in range(len(content_types)):
+                if (need[p][c]):
+                    f.write("\t" + "(wants " + person[p] + " " +
+                     content_types[c] + ")\n")
 
         f.write(")\n")
 
@@ -325,6 +346,7 @@ def main():
         for objname in uav:
             f.write("\n")
             # TODO: Write a goal that the UAV x is at the depot
+            f.write("\t" + "(at " + objname + " depot)\n")
 
         for person_num in range(options.persons):
             for contenttype_num in range(len(content_types)):
@@ -333,6 +355,9 @@ def main():
                     contenttype_name = content_types[contenttype_num]
                     # TODO: write a goal that the person needs a crate
                     #  with this specific content
+                    f.write("\t" + "(has " + person_name + " " +
+                            contenttype_name + ")\n")
+                    
 
         f.write("\t))\n")
         f.write(")\n")

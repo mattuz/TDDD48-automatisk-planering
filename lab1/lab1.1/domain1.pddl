@@ -1,4 +1,4 @@
-(define (domain emergency-services)
+(define (domain uav-domain)
     (:requirements :strips :typing)
     (:types
         person uav crate contents location - object

@@ -1,5 +1,5 @@
 (define (problem service1) 
-    (:domain emergency-services)
+    (:domain uav-domain)
 (:objects 
     p1 - person 
     uav1 - uav 

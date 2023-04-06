@@ -1,4 +1,4 @@
-(define (problem service2) (:domain emergency-services)
+(define (problem service2) (:domain uav-domain)
 (:objects 
     mark ellie - person
     uav1 - uav
@@ -16,7 +16,7 @@
 )
 
 (:goal (and
-    (has mark food) (has ellie medicine)
+    (has mark food) (has ellie medicine) (at uav1 depot)
 ))
 
 ;un-comment the following line if metric is needed
