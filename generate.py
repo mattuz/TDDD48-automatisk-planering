@@ -37,7 +37,7 @@ import sys
 # You can change this to generate other contents if you want.
 from typing import List, Tuple
 
-content_types = ["food", "medicine"]
+content_types = ["food", "medicine", "water"]
 
 
 ########################################################################################
@@ -294,7 +294,7 @@ def main():
         for objname in crate:
             f.write("\t" + objname + " - crate\n")
 
-        for objname in content_types:
+        for objname in contents:
             f.write("\t" + objname + " - contents\n")
 
         for objname in person:
@@ -311,6 +311,8 @@ def main():
         f.write("(:init\n")
 
         # TODO: Initialize all facts here!
+        for c in crate: 
+            f.write("\t" + "(at " + c + "depot)")
 
         f.write(")\n")
 
