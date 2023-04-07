@@ -4,24 +4,26 @@
         person uav crate contents location - object
     )
     (:predicates
-        (at ?x - object ?l - location)
-        (contains ?c - crate ?cont - contents)
-        (carry ?uav - uav ?c - crate)
-        (has ?p - person ?cont - contents)
-        (wants ?p - person ?cont - contents)
-        (free ?uav - uav)
+        (at ?x - object ?l - location) ;Check if an object is at a location
+        (contains ?c - crate ?cont - contents) ;Crate contains a specific content type
+        (carry ?uav - uav ?c - crate) ;A UAV is carrying the given crate
+        (has ?p - person ?cont - contents) ;A person has the content(s) given
+        (wants ?p - person ?cont - contents) ;A person wants/needs the specified content(s)
+        (free ?uav - uav) ;UAV is free, meaning it is not currently carrying a crate (or anything else)
     )
 
+    ;Load the given UAV with the given crate. 
     (:action LOAD-UAV
         :parameters (?c - crate ?uav - uav ?l - location)
         :precondition (and (at ?c ?l) (at ?uav ?l)
         (free ?uav)
-        )
+        ) 
         :effect (and (carry ?uav ?c) (not(at ?c ?l))
         (not(free ?uav))
         )
     )
 
+    ;Unload the UAV's crate at the given location, if it is where a person needs its contents. 
     (:action UNLOAD-UAV-TO-PERSON
         :parameters (
             ?uav - uav ?c - crate ?l - location
@@ -36,6 +38,7 @@
         )
     )
 
+    ;Fly the UAV from one location to another. 
     (:action FLY-UAV
         :parameters (?uav - uav ?l1 - location ?l2 - location)
         :precondition (and (at ?uav ?l1))
