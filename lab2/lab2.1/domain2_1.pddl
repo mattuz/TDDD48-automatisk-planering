@@ -1,6 +1,7 @@
 (define (domain uav-domain)
     (:requirements :strips :typing)
     (:types
+        num
         crate carrier - carriable
         person uav contents location carriable - object
         ;Is it possible to have carriable objects within object type?
@@ -13,12 +14,13 @@
         (wants ?p - person ?cont - contents) ;A person wants/needs the specified content(s)
         (free ?uav - uav) ;UAV is free, meaning it is not currently carrying a crate (or anything else)
         (loaded ?carrier - carrier ?c - crate)
-        
+        (next ?numA ?numB - num)
+        (count ?num - num)
         )
 
     ;Load the given UAV with the given crate. 
     (:action LOAD-UAV
-        :parameters (?c - crate ?uav - uav ?l - location)
+        :parameters (?c - carriable ?uav - uav ?l - location)
         :precondition (and (at ?c ?l) (at ?uav ?l)
         (free ?uav)
         ) 
@@ -57,12 +59,20 @@
         :effect (and (at ?uav ?l2) (not(at ?uav ?l1)))
     )
     
+    (:action RELEASE-CARRIER
+        :parameters (?uav - uav ?carrier - carrier ?l - location)
+        :precondition (and (carry ?uav ?carrier) (at ?uav ?l))
+        :effect (and (not(carry ?uav ?carrier) (free ?uav)
+        (at ?uav ?l) (at ?carrier ?l)))
+    )
+
     (:action LOAD-CRATE-ON-CARRIER
         :parameters (?uav - uav ?carrier - carrier ?l - location
-            ?c - crate 
+            ?c - crate
         )
-        :precondition (and )
-        :effect (and )
+        :precondition (and (at ?uav ?l) (at ?carrier ?l) (at ?c ?l)
+        (free ?uav))
+        :effect (and (loaded ?carrier ?c))
     )
     
     (:action TAKE-CRATE-FROM-CARRIER
