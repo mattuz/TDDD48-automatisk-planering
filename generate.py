@@ -181,6 +181,9 @@ def main():
     parser.add_option('-c', '--crates', metavar='NUM', type=int, dest='crates', help='the number of crates available')
     parser.add_option('-g', '--goals', metavar='NUM', type=int, dest='goals',
                       help='the number of crates assigned in the goal')
+    parser.add_option('-n', '--numbers', metavar='NUM', type=int, dest='numbers', 
+                      help='The maximum number of capacity for the carrier(s)')
+
 
     (options, args) = parser.parse_args()
 
@@ -219,6 +222,10 @@ def main():
     if options.goals > len(content_types) * options.persons:
         print("For", options.persons, "persons, you can have at most", len(content_types) * options.persons, "goals")
         sys.exit(1)
+    
+    if options.numbers is None:
+        print("You must specify --numbers (use --help for help)")
+        sys.exit(1)
 
     print("UAVs\t\t", options.uavs)
     print("Carriers\t", options.carriers)
@@ -226,6 +233,7 @@ def main():
     print("Persons\t\t", options.persons)
     print("Crates\t\t", options.crates)
     print("Goals\t\t", options.goals)
+    print("Numbers\t\t", options.numbers)
 
     # Set up all lists of objects
 
@@ -236,6 +244,7 @@ def main():
     crate: list[str] = []
     carrier: list[str] = []
     location: list[str] = []
+    number: list[str] = []
 
     location.append("depot")
     for objname in range(options.locations):
@@ -248,6 +257,8 @@ def main():
         crate.append("crate" + str(objname + 1))
     for objname in range(options.carriers):
         carrier.append("carrier" + str(objname + 1))
+    for objname in range(options.numbers):
+        number.append("n" + str(objname + 1))
 
     # Determine the set of crates for each content.
     # If content_types[0] is "food",
@@ -302,6 +313,9 @@ def main():
 
         for objname in carrier:
             f.write("\t" + objname + " - carrier\n")
+        
+        for objname in number:
+            f.write("\t" + objname + " - num\n")
 
         f.write(")\n")
 
@@ -317,6 +331,7 @@ def main():
                 f.write("\t" + "(at " + c + " " + "depot)\n")
                 f.write("\t" + "(contains " + c + " " + 
                         content_types[types] + ")\n")
+                f.write("\t" + "(available " + c + ")\n")
 
         
         #not sure if we want the UAV to start in depot..
