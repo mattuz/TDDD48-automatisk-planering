@@ -1,9 +1,8 @@
 (define (domain uav-domain)
     (:requirements :strips :typing)
     (:types
-        num
         crate carrier - carriable
-        person uav contents location carriable - object
+        person uav contents location crate carrier num - object
         ;Is it possible to have carriable objects within object type?
     )
     (:predicates
@@ -15,16 +14,16 @@
         (free ?uav - uav) ;UAV is free, meaning it is not currently carrying a crate (or anything else)
         (loaded ?carrier - carrier ?c - crate)
         (next ?numA ?numB - num)
-        (count ?num - num)
+        (count ?carrier - carrier ?num - num)
         )
 
     ;Load the given UAV with the given crate. 
     (:action LOAD-UAV
-        :parameters (?c - carriable ?uav - uav ?l - location)
+        :parameters (?c - crate ?uav - uav ?l - location)
         :precondition (and (at ?c ?l) (at ?uav ?l)
         (free ?uav)
         ) 
-        :effect (and (carry ?uav ?c) (not(at ?c ?l))
+        :effect (and (not(at ?c ?l)) (carry ?uav ?c)
         (not(free ?uav))
         )
     )
@@ -55,30 +54,33 @@
         :parameters (?uav - uav ?carrier - carrier ?l1 - location
                     ?l2 - location
         )
-        :precondition (and (at ?uav ?l1) (carry ?uav ?carrier))
-        :effect (and (at ?uav ?l2) (not(at ?uav ?l1)))
-    )
-    
-    (:action RELEASE-CARRIER
-        :parameters (?uav - uav ?carrier - carrier ?l - location)
-        :precondition (and (carry ?uav ?carrier) (at ?uav ?l))
-        :effect (and (not(carry ?uav ?carrier) (free ?uav)
-        (at ?uav ?l) (at ?carrier ?l)))
+        :precondition (and (at ?uav ?l1) (at ?carrier ?l1)
+        (free ?uav)
+        )
+        :effect (and (at ?uav ?l2) (not(at ?uav ?l1)) 
+        (at ?carrier ?l2) (not(at ?carrier ?l1))
+        )
     )
 
     (:action LOAD-CRATE-ON-CARRIER
         :parameters (?uav - uav ?carrier - carrier ?l - location
-            ?c - crate
+            ?c - crate ?from ?to - num
         )
         :precondition (and (at ?uav ?l) (at ?carrier ?l) (at ?c ?l)
-        (free ?uav))
-        :effect (and (loaded ?carrier ?c))
+        (carry ?uav ?c)
+        (count ?carrier ?from) (next ?from ?to))
+        :effect (and (loaded ?carrier ?c) (not (count ?carrier ?from))
+        (count ?carrier ?to) (not(at ?c ?l))
+        )
     )
     
     (:action TAKE-CRATE-FROM-CARRIER
-        :parameters ()
-        :precondition (and )
-        :effect (and )
+        :parameters (?uav - uav ?carrier - carriable ?l - location
+        ?c - crate)
+        :precondition (and (at ?uav ?l) (at ?carrier ?l) 
+        (loaded ?carrier ?c)
+        )
+        :effect (and (at ?c ?l))
     )
     
     
