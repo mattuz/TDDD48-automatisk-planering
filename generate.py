@@ -324,6 +324,9 @@ def main():
             f.write("\t" + "(at " + u + " depot)\n")
             f.write("\t" + "(free " + u + ")\n")
 
+        for c in carrier:
+            f.write("\t" + "(at " + c + " depot)\n")
+
         #Assign people to random locations (not depot)
         for p in person:
             l = random.choice(location[1:])
