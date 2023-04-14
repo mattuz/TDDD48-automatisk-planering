@@ -326,6 +326,12 @@ def main():
 
         # TODO: Initialize all facts here!
 
+        f.write("\t" + "(= (total-cost) 0)\n")
+
+        for loc1 in range(len(location)):
+            for loc2 in range(len(location)):
+                f.write("\t" + "(= (fly-cost " + location[loc1] + " " + location[loc2] + ") " + str(flight_cost(location_coords, loc1, loc2)) + ")\n")
+
         for types in range(len(content_types)):
             for c in crates_with_contents[types]:
                 f.write("\t" + "(at " + c + " " + "depot)\n")
@@ -378,6 +384,7 @@ def main():
                     
 
         f.write("\t))\n")
+        f.write("(:metric minimize (total-cost))\n")
         f.write(")\n")
 
 
