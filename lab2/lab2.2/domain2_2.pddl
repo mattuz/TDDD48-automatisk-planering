@@ -59,7 +59,7 @@
     
     (:action FLY-CARRIER
         :parameters (?uav - uav ?carrier - carrier ?l1 - location
-                    ?l2 - location ?from ?to - location
+                    ?l2 - location
         )
         :precondition (and (at ?uav ?l1) (at ?carrier ?l1)
         (free ?uav)

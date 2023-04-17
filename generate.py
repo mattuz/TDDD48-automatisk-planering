@@ -328,6 +328,13 @@ def main():
 
         f.write("\t" + "(= (total-cost) 0)\n")
 
+        for n in range(len(number)):
+            print(n)
+            if ((n) != (len(number)-1)):
+                f.write("\t" + "(next " + number[n] + " " + number[n+1] + ")\n")
+            else:
+                break
+
         for loc1 in range(len(location)):
             for loc2 in range(len(location)):
                 f.write("\t" + "(= (fly-cost " + location[loc1] + " " + location[loc2] + ") " + str(flight_cost(location_coords, loc1, loc2)) + ")\n")
@@ -347,6 +354,7 @@ def main():
 
         for c in carrier:
             f.write("\t" + "(at " + c + " depot)\n")
+            f.write("\t" + "(count " + c + " " + number[0] + ")\n")
 
         #Assign people to random locations (not depot)
         for p in person:
