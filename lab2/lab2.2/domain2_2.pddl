@@ -72,11 +72,11 @@
 
     (:action LOAD-CRATE-ON-CARRIER
         :parameters (?uav - uav ?carrier - carrier ?l - location
-            ?c - crate ?from ?to - num
+            ?c - crate ?from - num ?to - num
         )
         :precondition (and (at ?uav ?l) (at ?carrier ?l) (at ?c ?l)
-        (carry ?uav ?c)
-        (count ?carrier ?from) (next ?from ?to))
+        (carry ?uav ?c) (count ?carrier ?from) (next ?from ?to)
+        )
         :effect (and (loaded ?carrier ?c) (not (count ?carrier ?from))
         (count ?carrier ?to) (not(at ?c ?l)) (increase (total-cost) 5)
         )
@@ -88,7 +88,8 @@
         :precondition (and (at ?uav ?l) (at ?carrier ?l) 
         (loaded ?carrier ?c)
         )
-        :effect (and (at ?c ?l) (increase (total-cost) 5))
+        :effect (and (at ?c ?l) (not(loaded ?carrier ?c))
+         (increase (total-cost) 5))
     )
     
     

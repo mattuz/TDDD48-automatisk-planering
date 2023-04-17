@@ -329,7 +329,6 @@ def main():
         f.write("\t" + "(= (total-cost) 0)\n")
 
         for n in range(len(number)):
-            print(n)
             if ((n) != (len(number)-1)):
                 f.write("\t" + "(next " + number[n] + " " + number[n+1] + ")\n")
             else:
