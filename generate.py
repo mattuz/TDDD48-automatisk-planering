@@ -246,6 +246,7 @@ def main():
     location: list[str] = []
     number: list[str] = []
 
+    number.append("n0")
     location.append("depot")
     for objname in range(options.locations):
         location.append("loc" + str(objname + 1))
@@ -378,6 +379,8 @@ def main():
             f.write("\n")
             # TODO: Write a goal that the UAV x is at the depot
             f.write("\t" + "(at " + objname + " depot)\n")
+        for c in carrier:
+            f.write("\t" + "(at " + c + " depot)\n")
 
         for person_num in range(options.persons):
             for contenttype_num in range(len(content_types)):

@@ -26,7 +26,7 @@
         (free ?uav) (available ?c)
         ) 
         :effect (and (not(at ?c ?l)) (carry ?uav ?c)
-        (not(free ?uav)) (increase (total-cost) 10)
+        (not(free ?uav)) (increase (total-cost) 5)
         )
     )
 
@@ -42,7 +42,7 @@
         :effect (and (at ?c ?l) (not(carry ?uav ?c))
         (not (wants ?p ?cont)) (has ?p ?cont)
         (at ?uav ?l) (free ?uav) (not(available ?c))
-        (increase (total-cost) 10)
+        (increase (total-cost) 5)
         )
     )
 
@@ -74,11 +74,12 @@
         :parameters (?uav - uav ?carrier - carrier ?l - location
             ?c - crate ?from - num ?to - num
         )
-        :precondition (and (at ?uav ?l) (at ?carrier ?l) (at ?c ?l)
+        :precondition (and (at ?uav ?l) (at ?carrier ?l)
         (carry ?uav ?c) (count ?carrier ?from) (next ?from ?to)
         )
         :effect (and (loaded ?carrier ?c) (not (count ?carrier ?from))
-        (count ?carrier ?to) (not(at ?c ?l)) (increase (total-cost) 5)
+        (not (carry ?uav ?c)) (free ?uav)
+        (count ?carrier ?to) (increase (total-cost) 5)
         )
     )
     
@@ -86,9 +87,10 @@
         :parameters (?uav - uav ?carrier - carrier ?l - location
         ?c - crate)
         :precondition (and (at ?uav ?l) (at ?carrier ?l) 
-        (loaded ?carrier ?c)
+        (loaded ?carrier ?c) (free ?uav)
         )
-        :effect (and (at ?c ?l) (not(loaded ?carrier ?c))
+        :effect (and (not(loaded ?carrier ?c)) (carry ?uav ?c)
+        (not (free ?uav))
          (increase (total-cost) 5))
     )
     
