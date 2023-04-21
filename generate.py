@@ -327,7 +327,7 @@ def main():
 
         # TODO: Initialize all facts here!
 
-        f.write("\t" + "(= (total-cost) 0)\n")
+        #f.write("\t" + "(= (total-cost) 0)\n")
 
         for n in range(len(number)):
             if ((n) != (len(number)-1)):
@@ -355,12 +355,15 @@ def main():
         for c in carrier:
             f.write("\t" + "(at " + c + " depot)\n")
             f.write("\t" + "(count " + c + " " + number[0] + ")\n")
+            f.write("\t" + "(loadable " + c + ")\n")
 
         #Assign people to random locations (not depot)
         for p in person:
             l = random.choice(location[1:])
             f.write("\t" + "(at " + p + " " + l + ")\n")
-        
+            f.write("\t" + "(ready-for-delivery " + p + ")\n")
+
+
         for p in range(len(person)):
             for c in range(len(content_types)):
                 if (need[p][c]):
@@ -376,7 +379,6 @@ def main():
 
         # All UAVs should end up at the depot
         for objname in uav:
-            f.write("\n")
             # TODO: Write a goal that the UAV x is at the depot
             f.write("\t" + "(at " + objname + " depot)\n")
         for c in carrier:
@@ -394,7 +396,7 @@ def main():
                     
 
         f.write("\t))\n")
-        f.write("(:metric minimize (total-cost))\n")
+        #f.write("(:metric minimize (total-cost))\n")
         f.write(")\n")
 
 
