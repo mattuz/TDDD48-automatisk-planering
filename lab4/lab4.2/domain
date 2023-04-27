@@ -1,0 +1,59 @@
+(defdomain domain
+(
+
+(:operator (!load-uav ?uav ?crate ?loc)
+    ;;precon
+    ((at ?uav ?loc) (at ?crate ?loc) (free ?uav) (available ?crate))
+
+    ;;deletelist
+    ((at ?crate ?loc) (free ?uav))
+
+    ;;addlist
+    ((carry ?uav ?crate))
+) 
+
+(:operator (!unload-uav-to-person ?uav ?crate ?loc ?person ?contents) ;;deliver instead? 
+    ;;precon
+    ((at ?uav ?loc) (carry ?uav ?crate) (at ?person ?loc)
+    (needs ?person ?contents) (available ?crate)
+    )
+
+    ;;deletelist
+    ((carry ?uav ?crate) (needs ?person ?contents) (available ?crate))
+
+    ;;addlist
+    ((free ?uav) (at ?crate ?loc) (has ?person ?contents))
+)
+
+(:operator (!fly-uav ?uav ?from ?to)
+    ((at ?uav ?from))
+    ((at ?uav ?from))
+    ((at ?uav ?to))
+) 
+
+(:method (deliver-crate ?uav ?crate ?from ?to ?person ?contents)
+    ((has ?person ?contents)) ;;if person already has what they need
+    () ;; don't to anything
+    
+    ((needs ?person ?contents)) ;;if a person needs the contents
+
+    ;;
+    ((!load-uav ?uav ?crate ?from)
+    (!fly-uav ?uav ?from ?to)
+    (!unload-uav-to-person ?uav ?crate ?to ?person ?contents)
+    ) 
+
+)
+
+(:method (deliver-all)
+    ((forall (?person) (needs ?person ?contents) ()))
+    ((deliver-crate ?uav ?crate ?from ?to ?person ?contents)
+    (deliver-all)
+    )
+
+    () ;;only reaches this if it's done
+    () ;;so nothing has to be done
+)
+
+)
+)
