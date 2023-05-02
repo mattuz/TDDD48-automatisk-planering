@@ -32,6 +32,9 @@
 ) 
 
 (:method (deliver-crate ?uav ?crate ?from ?to ?person ?contents)
+    ((has ?person ?contents)) ;;if person already has what they need
+    () ;; don't to anything
+
     ((needs ?person ?contents)) ;;if a person needs the contents
 
     ;;
@@ -40,15 +43,13 @@
     (!unload-uav-to-person ?uav ?crate ?to ?person ?contents)
     ) 
 
-    ((has ?person ?contents)) ;;if person already has what they need
-    () ;; don't to anything
 
 )
 
 (:method (deliver-all)
-    ((forall (?person) (needs ?person ?contents) ()))
+    (((needs ?person ?contents)))
     ((deliver-crate ?uav ?crate ?from ?to ?person ?contents)
-    ;;(deliver-all) ;;turns into infinite recursion? 
+    (deliver-all) ;;turns into infinite recursion? 
     )
 
     () ;;only reaches this if it's done
