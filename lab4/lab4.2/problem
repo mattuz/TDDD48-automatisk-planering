@@ -1,0 +1,43 @@
+(defproblem problem domain
+;;Initial state
+( ;;at, has, etc. 
+    (uav uav1)
+    (location depot)
+    (location loc1)
+    (location loc2)
+    (location loc3)
+    (crate c1)
+    (crate c2)
+    (crate c3)
+    (contents food)
+    (contents water)
+    (contents medicine)
+    (person p1)
+    (person p2)
+    (person p3)
+
+    (free uav1)
+    (at uav1 depot)
+
+    (at c1 depot)
+    (contains c1 food)
+    (available c1)
+    (at c2 depot)
+    (contains c2 water)
+    (available c2)
+    (at c3 depot)
+    (contains c3 medicine)
+    (available c3)
+
+    (at p1 loc1)
+    (needs p1 food)
+    (at p2 loc2)
+    (needs p2 water)
+    (at p3 loc3)
+    (needs p3 medicine)
+)
+;; Initial task list
+( ;; do this, do that ...
+    (deliver-all)
+)
+)
