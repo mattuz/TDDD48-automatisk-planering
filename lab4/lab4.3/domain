@@ -1,56 +1,140 @@
 (defdomain domain
 (
 
-(:operator (!load-uav ?uav ?crate ?loc)
+(:operator (!load-uav ?uav ?contents ?loc)
     ;;precon
-    ((at ?uav ?loc) (at ?crate ?loc) (free ?uav) (available ?crate))
+    ((at ?uav ?loc) (free ?uav) (no-crates ?contents ?amount)
+    (call > amount 0) ;;check that there are more than 0 crates with specific contents
+    )                 ;;otherwise uav can't pick it up
 
     ;;deletelist
-    ((at ?crate ?loc) (free ?uav))
+    ((free ?uav) (no-crates ?contents ?amount))
 
     ;;addlist
-    ((carry ?uav ?crate))
+    ((carry ?uav ?contents)
+    (no-crates ?contents (call - ?amount 1))
+    )
 ) 
 
-(:operator (!unload-uav-to-person ?uav ?crate ?loc ?person ?contents) ;;deliver instead? 
+(:operator (!unload-uav-to-location ?uav ?loc ?contents) ;;deliver instead? 
     ;;precon
-    ((at ?uav ?loc) (carry ?uav ?crate) (at ?person ?loc)
-    (needs ?person ?contents) (available ?crate)
+    ((at ?uav ?loc) (carry ?uav ?contents) (at ?loc)
+    (needs ?loc ?contents ?needs)
+    (has ?loc ?contents ?has)
+    (call < ?has ?needs) ;;if location needs more of specific content than it has
     )
 
     ;;deletelist
-    ((carry ?uav ?crate) (needs ?person ?contents) (available ?crate))
+    ((carry ?uav ?contents) (needs ?loc ?contents)
+    (needs ?loc ?contents ?needs)
+    (has ?loc ?contents ?has)
+    )
 
     ;;addlist
-    ((free ?uav) (at ?crate ?loc) (has ?person ?contents))
+    ((free ?uav) (at ?loc) 
+    (has ?loc ?contents (call + ?has 1)) ;;has 1 more now
+    (needs ?loc ?contents (call - ?needs 1)) ;;needs 1 less
+    )
 )
 
 (:operator (!fly-uav ?uav ?from ?to)
+    ;;precon
     ((at ?uav ?from))
+    ;;deletelist
     ((at ?uav ?from))
+    ;;addlist
     ((at ?uav ?to))
 ) 
 
-(:method (deliver-crate ?uav ?crate ?from ?to ?person ?contents)
-    ((has ?person ?contents)) ;;if person already has what they need
+(:operator (!fly-carrier ?uav ?carrier ?from ?to)
+    ;;precon
+    ((at ?uav ?from) (at ?carrier ?from) (free ?uav))
+    ;;deletelist
+    ((at ?uav ?from) (at ?carrier ?from) (free ?uav)) ;;"lock" uav with !free
+    ;;addlist
+    ((at ?uav ?to) (at ?carrier ?to) (free ?uav)) ;;uav stops holding carrier, and is free again
+) 
+
+
+(:operator (!load-carrier ?uav ?carrier ?loc ?contents)
+;;precon
+    ((at ?uav ?loc) (at ?carrier ?loc) (capacity ?carrier ?capacity) (load ?carrier ?load)
+    (call < ?load ?capacity)
+    (at ?contents ?loc)
+    )
+    ;;deletelist
+    ((load ?carrier ?load) (at ?contents ?loc)) ;;Not sure about the contents 
+                                                ;;stuff here and in addlist.
+    ;;addlist
+    ((load ?carrier (call + ?load 1))(in ?carrier ?contents))
+) 
+
+(:method (deliver-crate ?uav ?carrier ?from ?to ?contents)
+    ((has ?to ?contents ?has) (needs ?to ?contents ?needs)
+    (call = ?has ?needs)
+    ) ;;if location already has what they need
     () ;; don't to anything
 
-    ((needs ?person ?contents)(location ?to)(location ?from)) ;;if a person needs the contents
-
+    ((needs ?to ?contents ?needs) ;;if a location needs the contents
+    (location ?to)(location ?from)
+    (has ?to ?contents ?has)
+    (call < ?has ?needs) ;;do we have less than we want? get more
+    )
     ;;
-    ((!load-uav ?uav ?crate ?from)
+    ((!load-uav ?uav ?from)
     (!fly-uav ?uav ?from ?to)
-    (!unload-uav-to-person ?uav ?crate ?to ?person ?contents)
+    (!unload-uav-to-location ?uav ?to ?contents)
     (!fly-uav ?uav ?to ?from)
     ) 
+)
 
+(:method (load-carrier-full ?uav ?carrier ?loc ?contents)
+    (
+        (at ?uav ?loc) (at ?carrier ?loc)
+        (capacity ?carrier ?capacity) (load ?carrier ?load)
+        (call = ?capacity ?load) ;;if capacity is reached
+    )
+    () ;;do nothing
+
+    (
+        (at ?uav ?loc) (at ?carrier ?loc)
+        (capacity ?carrier ?capacity) (load ?carrier ?load)
+        (call < ?load ?capacity) ;;if capacity not reached
+    )
+    (
+        (!load-carrier ?uav ?carrier ?loc ?contents)
+        (load-carrier-full) ;;go again to see if finished. 
+    )  
 
 )
 
+(:method (deliver-carrier ?uav ?carrier ?from ?to ?contents)
+    ((has ?to ?contents ?has) (needs ?to ?contents ?needs)
+    (call = ?has ?needs))
+    () ;;if has==needs, done
+
+    ((needs ?to ?contents ?needs) ;;if a location needs the contents
+    (location ?to)(location ?from)
+    (has ?to ?contents ?has)
+    (call < ?has ?needs))
+    (
+    ()
+    ;;what we want:
+    ;;load carrier (until full?)
+    ;;fly carrier to loc
+    ;;not sure if we need to deliver crates from carrier? 
+    )
+)
+
 (:method (deliver-all)
-    (((needs ?person ?contents)))
-    ((deliver-crate ?uav ?crate ?from ?to ?person ?contents)
-    (deliver-all) ;;turns into infinite recursion? 
+    ((needs ?loc ?contents ?needs)(call = ?needs 1))
+    ((deliver-crate ?uav ?from ?to ?contents)
+    (deliver-all) 
+    )
+
+    ((needs ?loc ?contents ?needs) (call > ?needs 2))
+    ((deliver-carrier ?uav ?carrier ?from ?to ?contents)
+    (deliver-all)
     )
 
     () ;;only reaches this if it's done
