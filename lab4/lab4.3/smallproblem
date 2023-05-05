@@ -1,0 +1,34 @@
+(defproblem problem domain
+;;Initial state
+( ;;at, has, etc. 
+    (uav uav1)
+    (carrier carrier1)
+    (location depot)
+    (location loc1)
+    (location loc2)
+    (contents medicine)
+    (contents food)
+
+    (free uav1)
+    (at uav1 depot)
+    (at carrier1 depot)
+    (capacity carrier1 4)
+    (load carrier1 0)
+
+    (has depot food 1)
+    (has depot medicine 3)
+
+    (needs loc1 medicine 3)
+    (has loc1 medicine 0)
+    (needs loc2 food 1)
+    (has loc2 food 0)
+)
+;; Initial task list
+( ;; do this, do that ...
+    ;;(deliver-crate uav1 c1 depot loc1 p1 medicine) ;;this works
+    ((deliver-crate uav1 depot loc2 food)
+    (load-carrier-full uav1 carrier1 depot medicine)
+    (!fly-carrier uav1 carrier1 depot loc1)
+    )
+)
+)

@@ -3,22 +3,22 @@
 
 (:operator (!load-uav ?uav ?contents ?loc)
     ;;precon
-    ((at ?uav ?loc) (free ?uav) (no-crates ?contents ?amount)
-    (call > amount 0) ;;check that there are more than 0 crates with specific contents
+    ((at ?uav ?loc) (free ?uav) (contents ?contents) (has ?loc ?contents ?has)
+    (call > ?has 0) ;;check that there are more than 0 crates with specific contents
     )                 ;;otherwise uav can't pick it up
 
     ;;deletelist
-    ((free ?uav) (no-crates ?contents ?amount))
+    ((free ?uav) (has ?loc ?contents ?has))
 
     ;;addlist
     ((carry ?uav ?contents)
-    (no-crates ?contents (call - ?amount 1))
+    (has ?loc ?contents (call - ?has 1))
     )
 ) 
 
 (:operator (!unload-uav-to-location ?uav ?loc ?contents) ;;deliver instead? 
     ;;precon
-    ((at ?uav ?loc) (carry ?uav ?contents) (at ?loc)
+    ((at ?uav ?loc) (carry ?uav ?contents)
     (needs ?loc ?contents ?needs)
     (has ?loc ?contents ?has)
     (call < ?has ?needs) ;;if location needs more of specific content than it has
@@ -60,16 +60,37 @@
 ;;precon
     ((at ?uav ?loc) (at ?carrier ?loc) (capacity ?carrier ?capacity) (load ?carrier ?load)
     (call < ?load ?capacity)
-    (at ?contents ?loc)
+    (has ?loc ?contents ?has) (call > ?has 0)
     )
     ;;deletelist
-    ((load ?carrier ?load) (at ?contents ?loc)) ;;Not sure about the contents 
-                                                ;;stuff here and in addlist.
+    ((load ?carrier ?load) (has ?loc ?contents ?has)) 
+
     ;;addlist
-    ((load ?carrier (call + ?load 1))(in ?carrier ?contents))
+    ((load ?carrier (call + ?load 1)) (in ?carrier ?contents) ;;not sure if "in ..." is necessary
+    (has ?loc ?contents (call - ?has 1))
+    )
 ) 
 
-(:method (deliver-crate ?uav ?carrier ?from ?to ?contents)
+(:operator (!unload-carrier ?uav ?carrier ?loc ?contents) ;;Might want a method for this. 
+    ;;precon                                              ;;both method and operator necessary in that case
+    ((at ?uav ?loc) (at ?carrier ?loc) (load ?carrier ?load)
+    (has ?loc ?contents ?has) (in ?carrier ?contents)
+    )
+    ;;deletelist
+    ((load ?carrier ?load) (has ?loc ?contents ?has)) 
+
+    ;;addlist
+    ((load ?carrier (call + ?load 1)) ;;(in ?carrier ?contents) ;;not sure if "in ..." is necessary
+    (has ?loc ?contents (call - ?has 1))
+    )
+) 
+;;thoughts:
+;;if carrier empty - done
+;;if carrier not empty - unload one crate
+;;go again
+
+
+(:method (deliver-crate ?uav ?from ?to ?contents)
     ((has ?to ?contents ?has) (needs ?to ?contents ?needs)
     (call = ?has ?needs)
     ) ;;if location already has what they need
@@ -81,7 +102,7 @@
     (call < ?has ?needs) ;;do we have less than we want? get more
     )
     ;;
-    ((!load-uav ?uav ?from)
+    ((!load-uav ?uav ?contents ?from)
     (!fly-uav ?uav ?from ?to)
     (!unload-uav-to-location ?uav ?to ?contents)
     (!fly-uav ?uav ?to ?from)
@@ -100,34 +121,40 @@
         (at ?uav ?loc) (at ?carrier ?loc)
         (capacity ?carrier ?capacity) (load ?carrier ?load)
         (call < ?load ?capacity) ;;if capacity not reached
+        (has ?loc ?contents ?has) (call > ?has 0)
     )
     (
         (!load-carrier ?uav ?carrier ?loc ?contents)
-        (load-carrier-full) ;;go again to see if finished. 
+        (load-carrier-full ?uav ?carrier ?loc ?contents) ;;go again to see if finished. 
     )  
+    
+    ()
+    ()
 
 )
 
 (:method (deliver-carrier ?uav ?carrier ?from ?to ?contents)
-    ((has ?to ?contents ?has) (needs ?to ?contents ?needs)
+    ((location ?from) (location ?to)    
+    (has ?to ?contents ?has) (needs ?to ?contents ?needs)
     (call = ?has ?needs))
     () ;;if has==needs, done
 
     ((needs ?to ?contents ?needs) ;;if a location needs the contents
     (location ?to)(location ?from)
+    (uav ?uav) (carrier ?carrier)
     (has ?to ?contents ?has)
     (call < ?has ?needs))
     (
-    ()
-    ;;what we want:
-    ;;load carrier (until full?)
-    ;;fly carrier to loc
-    ;;not sure if we need to deliver crates from carrier? 
+    (load-carrier-full ?uav ?carrier ?from ?contents)
+    (!fly-carrier ?uav ?carrier ?from ?to)
+    (!unload-carrier ?uav ?carrier ?to ?contents)
     )
 )
 
 (:method (deliver-all)
-    ((needs ?loc ?contents ?needs)(call = ?needs 1))
+    ((needs ?loc ?contents ?needs)(call = ?needs 1)
+    (location ?loc)
+    )
     ((deliver-crate ?uav ?from ?to ?contents)
     (deliver-all) 
     )
