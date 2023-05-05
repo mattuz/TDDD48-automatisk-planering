@@ -24,11 +24,9 @@
     (has loc2 food 0)
 )
 ;; Initial task list
-( ;; do this, do that ...
-    ;;(deliver-crate uav1 c1 depot loc1 p1 medicine) ;;this works
+(
     ((deliver-crate uav1 depot loc2 food)
-    (load-carrier-full uav1 carrier1 depot medicine)
-    (!fly-carrier uav1 carrier1 depot loc1)
+    (deliver-carrier uav1 carrier1 depot loc1 medicine)
     )
 )
 )

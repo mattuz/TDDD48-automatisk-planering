@@ -75,17 +75,20 @@
     ;;precon                                              ;;both method and operator necessary in that case
     (
         (at ?uav ?loc) (at ?carrier ?loc) (load ?carrier ?load)
-        (has ?loc ?contents ?has) (in ?carrier ?contents)
+        (has ?loc ?contents ?has) 
+        (needs ?loc ?contents ?needs)
     )
     ;;deletelist
     (
-        (load ?carrier ?load) (has ?loc ?contents ?has) (in ?carrier ?contents)
+        (load ?carrier ?load) (has ?loc ?contents ?has)
+        (needs ?loc ?contents ?needs)
     ) 
 
     ;;addlist
     (
         (load ?carrier (call - ?load 1))
         (has ?loc ?contents (call + ?has 1))
+        (needs ?loc ?contents (call - ?needs 1))
         
     )
 ) 
@@ -100,7 +103,7 @@
         (at ?uav ?loc) (at ?carrier ?loc)
         (load ?carrier ?load) (call > ?load 0)
         (has ?loc ?contents ?has) (needs ?loc ?contents ?needs)
-        (call < ?has ?needs)
+        (call > ?needs 0)
     )
     (
         (!unload-carrier ?uav ?carrier ?loc ?contents)
@@ -170,6 +173,7 @@
     (load-carrier-full ?uav ?carrier ?from ?contents)
     (!fly-carrier ?uav ?carrier ?from ?to)
     (unload-carrier ?uav ?carrier ?to ?contents)
+    (!fly-carrier ?uav ?carrier ?to ?from)
     )
 )
 
