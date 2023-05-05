@@ -73,21 +73,43 @@
 
 (:operator (!unload-carrier ?uav ?carrier ?loc ?contents) ;;Might want a method for this. 
     ;;precon                                              ;;both method and operator necessary in that case
-    ((at ?uav ?loc) (at ?carrier ?loc) (load ?carrier ?load)
-    (has ?loc ?contents ?has) (in ?carrier ?contents)
+    (
+        (at ?uav ?loc) (at ?carrier ?loc) (load ?carrier ?load)
+        (has ?loc ?contents ?has) (in ?carrier ?contents)
     )
     ;;deletelist
-    ((load ?carrier ?load) (has ?loc ?contents ?has)) 
+    (
+        (load ?carrier ?load) (has ?loc ?contents ?has) (in ?carrier ?contents)
+    ) 
 
     ;;addlist
-    ((load ?carrier (call + ?load 1)) ;;(in ?carrier ?contents) ;;not sure if "in ..." is necessary
-    (has ?loc ?contents (call - ?has 1))
+    (
+        (load ?carrier (call - ?load 1))
+        (has ?loc ?contents (call + ?has 1))
+        
     )
 ) 
-;;thoughts:
-;;if carrier empty - done
-;;if carrier not empty - unload one crate
-;;go again
+
+(:method (unload-carrier ?uav ?carrier ?loc ?contents)
+    (
+        (load ?carrier ?load) (call = ?load 0)
+    ) 
+    () ;; Carrier empty, done
+
+    (
+        (at ?uav ?loc) (at ?carrier ?loc)
+        (load ?carrier ?load) (call > ?load 0)
+        (has ?loc ?contents ?has) (needs ?loc ?contents ?needs)
+        (call < ?has ?needs)
+    )
+    (
+        (!unload-carrier ?uav ?carrier ?loc ?contents)
+        (unload-carrier ?uav ?carrier ?loc ?contents)
+    )
+    
+    ()
+    ()
+)
 
 
 (:method (deliver-crate ?uav ?from ?to ?contents)
@@ -147,7 +169,7 @@
     (
     (load-carrier-full ?uav ?carrier ?from ?contents)
     (!fly-carrier ?uav ?carrier ?from ?to)
-    (!unload-carrier ?uav ?carrier ?to ?contents)
+    (unload-carrier ?uav ?carrier ?to ?contents)
     )
 )
 
