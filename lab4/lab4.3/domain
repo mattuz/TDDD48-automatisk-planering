@@ -21,7 +21,7 @@
     ((at ?uav ?loc) (carry ?uav ?contents)
     (needs ?loc ?contents ?needs)
     (has ?loc ?contents ?has)
-    (call < ?has ?needs) ;;if location needs more of specific content than it has
+    (call > ?needs 0) ;;if location needs more of specific content than it has
     )
 
     ;;deletelist
@@ -60,13 +60,13 @@
 ;;precon
     ((at ?uav ?loc) (at ?carrier ?loc) (capacity ?carrier ?capacity) (load ?carrier ?load)
     (call < ?load ?capacity)
-    (has ?loc ?contents ?has) (call > ?has 0)
+    (has ?loc ?contents ?has) (call > ?has 0) 
     )
     ;;deletelist
     ((load ?carrier ?load) (has ?loc ?contents ?has)) 
 
     ;;addlist
-    ((load ?carrier (call + ?load 1)) (in ?carrier ?contents) ;;not sure if "in ..." is necessary
+    ((load ?carrier (call + ?load 1))
     (has ?loc ?contents (call - ?has 1))
     )
 ) 
@@ -124,7 +124,7 @@
     ((needs ?to ?contents ?needs) ;;if a location needs the contents
     (location ?to)(location ?from)
     (has ?to ?contents ?has)
-    (call < ?has ?needs) ;;do we have less than we want? get more
+    (call > ?needs 0) ;;do we have less than we want? get more
     )
     ;;
     ((!load-uav ?uav ?contents ?from)
@@ -134,11 +134,18 @@
     ) 
 )
 
-(:method (load-carrier-full ?uav ?carrier ?loc ?contents)
+(:method (load-carrier-full ?uav ?carrier ?loc ?contents ?needs)
     (
         (at ?uav ?loc) (at ?carrier ?loc)
         (capacity ?carrier ?capacity) (load ?carrier ?load)
         (call = ?capacity ?load) ;;if capacity is reached
+    )
+    () ;;do nothing
+
+    ( ;; if load = needs, no need to load more 
+        (at ?uav ?loc) (at ?carrier ?loc)
+        (load ?carrier ?load)
+        (call = ?needs ?load)
     )
     () ;;do nothing
 
@@ -150,7 +157,7 @@
     )
     (
         (!load-carrier ?uav ?carrier ?loc ?contents)
-        (load-carrier-full ?uav ?carrier ?loc ?contents) ;;go again to see if finished. 
+        (load-carrier-full ?uav ?carrier ?loc ?contents ?needs) ;;go again to see if finished. 
     )  
     
     ()
@@ -168,9 +175,9 @@
     (location ?to)(location ?from)
     (uav ?uav) (carrier ?carrier)
     (has ?to ?contents ?has)
-    (call < ?has ?needs))
+    (call > ?needs 0))
     (
-    (load-carrier-full ?uav ?carrier ?from ?contents)
+    (load-carrier-full ?uav ?carrier ?from ?contents ?needs)
     (!fly-carrier ?uav ?carrier ?from ?to)
     (unload-carrier ?uav ?carrier ?to ?contents)
     (!fly-carrier ?uav ?carrier ?to ?from)
@@ -185,7 +192,7 @@
     (deliver-all) 
     )
 
-    ((needs ?loc ?contents ?needs) (call > ?needs 2))
+    ((needs ?loc ?contents ?needs) (call > ?needs 1))
     ((deliver-carrier ?uav ?carrier ?from ?to ?contents)
     (deliver-all)
     )
