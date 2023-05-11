@@ -15,18 +15,17 @@
     (capacity carrier1 4)
     (load carrier1 0)
 
-    (has depot food 1)
-    (has depot medicine 3)
+    (has depot food 20)
+    (has depot medicine 23)
 
-    (needs loc1 medicine 3)
+    (needs loc1 medicine 8)
     (has loc1 medicine 0)
     (needs loc2 food 1)
     (has loc2 food 0)
 )
 ;; Initial task list
 (
-    (;;(deliver-crate uav1 depot loc2 food)
-    ;;(deliver-carrier uav1 carrier1 depot loc1 medicine)
+    (
         (deliver-all)
     )
 )

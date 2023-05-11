@@ -116,8 +116,8 @@
 
 
 (:method (deliver-crate ?uav ?from ?to ?contents)
-    ((has ?to ?contents ?has) (needs ?to ?contents ?needs)
-    (call = ?has ?needs)
+    ((needs ?to ?contents ?needs)
+    (call = ?needs 0) ;;THIS IS WIERD
     ) ;;if location already has what they need
     () ;; don't to anything
 
@@ -132,6 +132,9 @@
     (!unload-uav-to-location ?uav ?to ?contents)
     (!fly-uav ?uav ?to ?from)
     ) 
+
+    ()
+    ()
 )
 
 (:method (load-carrier-full ?uav ?carrier ?loc ?contents ?needs)
@@ -167,9 +170,9 @@
 
 (:method (deliver-carrier ?uav ?carrier ?from ?to ?contents)
     ((location ?from) (location ?to)    
-    (has ?to ?contents ?has) (needs ?to ?contents ?needs)
-    (call = ?has ?needs))
-    () ;;if has==needs, done
+    (needs ?to ?contents ?needs)
+    (call = ?needs 0))
+    () ;;if needs==0, done
 
     ((needs ?to ?contents ?needs) ;;if a location needs the contents
     (location ?to)(location ?from)
@@ -182,19 +185,27 @@
     (unload-carrier ?uav ?carrier ?to ?contents)
     (!fly-carrier ?uav ?carrier ?to ?from)
     )
+
+    ()
+    ()
 )
 
 (:method (deliver-all)
-    ((needs ?loc ?contents ?needs)(call = ?needs 1)
-    (location ?loc)
+    (
+        (location ?to)
+        (needs ?to ?contents ?needs)(call = ?needs 1)
     )
-    ((deliver-crate ?uav ?from ?to ?contents)
-    (deliver-all) 
+    (
+        (deliver-crate ?uav ?from ?to ?contents)
+        (deliver-all) 
     )
 
-    ((needs ?loc ?contents ?needs) (call > ?needs 1))
-    ((deliver-carrier ?uav ?carrier ?from ?to ?contents)
-    (deliver-all)
+    (
+        (location ?to)
+        (needs ?to ?contents ?needs) (call > ?needs 1))
+    (
+        (deliver-carrier ?uav ?carrier ?from ?to ?contents)
+        (deliver-all)
     )
 
     () ;;only reaches this if it's done
@@ -203,3 +214,5 @@
 
 )
 )
+
+;;120 174
