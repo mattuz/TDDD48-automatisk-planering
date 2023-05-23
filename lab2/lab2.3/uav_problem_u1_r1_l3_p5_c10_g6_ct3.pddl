@@ -114,4 +114,5 @@
 	(has person5 food)
 	(has person5 medicine)
 	))
+(:metric minimize (total-cost))
 )

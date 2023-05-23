@@ -396,7 +396,7 @@ def main():
                     
 
         f.write("\t))\n")
-        #f.write("(:metric minimize (total-cost))\n")
+        f.write("(:metric minimize (total-cost))\n")
         f.write(")\n")
 
 

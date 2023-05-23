@@ -146,4 +146,5 @@
 	(has person6 water)
 	(has person7 water)
 	))
+(:metric minimize (total-cost))
 )
