@@ -1,7 +1,7 @@
 (defdomain domain
 (
 
-(:operator (!load-uav ?uav ?crate ?loc)
+(:operator (!load-uav ?uav ?crate ?loc) ;;load the UAV
     ;;precon
     ((at ?uav ?loc) (at ?crate ?loc) (free ?uav) (available ?crate))
 
@@ -12,10 +12,10 @@
     ((carry ?uav ?crate))
 ) 
 
-(:operator (!unload-uav-to-person ?uav ?crate ?loc ?person ?contents) ;;deliver instead? 
+(:operator (!unload-uav-to-person ?uav ?crate ?loc ?person ?contents) ;;Unload UAV
     ;;precon
     ((at ?uav ?loc) (carry ?uav ?crate) (at ?person ?loc)
-    (needs ?person ?contents) (available ?crate)
+    (needs ?person ?contents) (available ?crate) ;;person needs the contents
     )
 
     ;;deletelist
@@ -25,32 +25,32 @@
     ((free ?uav) (at ?crate ?loc) (has ?person ?contents))
 )
 
-(:operator (!fly-uav ?uav ?from ?to)
+(:operator (!fly-uav ?uav ?from ?to) ;;Fly UAV
     ((at ?uav ?from))
     ((at ?uav ?from))
     ((at ?uav ?to))
 ) 
 
-(:method (deliver-crate ?uav ?crate ?from ?to ?person ?contents)
+(:method (deliver-crate ?uav ?crate ?from ?to ?person ?contents) ;;Deliver crate method
     ((has ?person ?contents)) ;;if person already has what they need
     () ;; don't to anything
 
     ((needs ?person ?contents)(location ?to)(location ?from)) ;;if a person needs the contents
 
     ;;
-    ((!load-uav ?uav ?crate ?from)
-    (!fly-uav ?uav ?from ?to)
-    (!unload-uav-to-person ?uav ?crate ?to ?person ?contents)
-    (!fly-uav ?uav ?to ?from)
+    ((!load-uav ?uav ?crate ?from)                          ;;load uav
+    (!fly-uav ?uav ?from ?to)                               ;;fly to "goal" location
+    (!unload-uav-to-person ?uav ?crate ?to ?person ?contents);;unload uav
+    (!fly-uav ?uav ?to ?from)                               ;;fly the UAV back to where it came from (depot)
     ) 
 
 
 )
 
 (:method (deliver-all)
-    (((needs ?person ?contents)))
-    ((deliver-crate ?uav ?crate ?from ?to ?person ?contents)
-    (deliver-all) ;;turns into infinite recursion? 
+    (((needs ?person ?contents))) ;;If a person needs contents
+    ((deliver-crate ?uav ?crate ?from ?to ?person ?contents) ;;deliver crates there
+    (deliver-all) 
     )
 
     () ;;only reaches this if it's done
